@@ -1,0 +1,54 @@
+{
+  "name": "express-react-middleware",
+  "version": "1.0.0",
+  "description": "Render react components from the server as views",
+  "main": "index.js",
+  "license": "LICENSE",
+  "scripts": {
+    "test": "./node_modules/.bin/jest --config jest.config.json",
+    "build": "./node_modules/.bin/babel ./src/middleware.js --out-file ./index.js --source-maps inline --minified --compact"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/normancarcamo/express-react-middleware.git"
+  },
+  "contributors": [],
+  "author": {
+    "name": "Norman Carcamo",
+    "email": "normancarcamo@gmail.com",
+    "url": "normancarcamo.com"
+  },
+  "maintainers": [
+    "Norman Carcamo <normancarcamo@gmail.com> (normancarcamo.com)"
+  ],
+  "keywords": [
+    "express-react-middleware",
+    "react render middleware",
+    "express react middleware",
+    "node-express-react-middleware",
+    "node express react middleware"
+  ],
+  "bugs": {
+    "url": "https://github.com/normancarcamo/express-react-middleware/issues"
+  },
+  "homepage": "https://github.com/normancarcamo/express-react-middleware",
+  "devDependencies": {
+    "babel-cli": "^6.24.1",
+    "babel-core": "^6.25.0",
+    "babel-jest": "^20.0.3",
+    "babel-loader": "^7.1.1",
+    "babel-preset-env": "^1.6.0",
+    "babel-preset-react": "^6.24.1",
+    "jest": "^20.0.4",
+    "node-mocks-http": "^1.6.3",
+    "sinon": "^2.3.6"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.1",
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-router": "^4.1.1",
+    "react-router-config": "^1.0.0-beta.3",
+    "react-router-dom": "^4.1.1"
+  }
+}
