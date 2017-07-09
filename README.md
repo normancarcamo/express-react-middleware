@@ -192,4 +192,4 @@ app.get('/contact', (req, res) => {
 `` npm run test ``
 
 ## Examples:
-`Pending upload them...`
+See [examples folder](https://github.com/normancarcamo/express-react-middleware/tree/master/example)
