@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Render react components from the server as views",
   "main": "index.js",
-  "license": "LICENSE",
+  "license": "UNLICENSED",
   "scripts": {
     "test": "./node_modules/.bin/jest --config jest.config.json",
     "build": "./node_modules/.bin/babel ./src/middleware.js --out-file ./index.js --source-maps inline --minified --compact"
