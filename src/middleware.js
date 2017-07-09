@@ -1,6 +1,7 @@
 const React = require('react');
 const { readdirSync } = require('fs');
 const { resolve } = require('path');
+const { renderRoutes, matchRoutes } = require('react-router-config');
 const {
   isObject,
   isFunction,
@@ -10,8 +11,7 @@ const {
   resolveComponent,
   renderComponent,
   avoidXSS,
-} = require(resolve(process.cwd(), 'src/helpers.js'));
-const { renderRoutes, matchRoutes } = require('react-router-config');
+} = require('./helpers.js');
 
 module.exports = (options) => {
   if (isObject(options)) {
