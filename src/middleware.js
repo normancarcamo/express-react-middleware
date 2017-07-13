@@ -25,7 +25,7 @@ module.exports = (options) => {
     // Check if routes option is valid:
     if (('routes' in options)) {
       if (!isArray(options.routes)) {
-        throw new Error('"react-render-middleware" -> "routes" property must be an array.');
+        throw new Error('"routes" property must be an array.');
       }
       if (arrayHasValues(options.routes)) {
         routes = true;
@@ -34,22 +34,22 @@ module.exports = (options) => {
 
     // This option is used independently if routes were found or not.
     if (!templateHTML) {
-      throw '"react-render-middleware" -> "templateHTML" property must be defined';
+      throw '"templateHTML" property must be defined';
     } else {
       if (!isString(templateHTML)) {
-        throw '"react-render-middleware" -> "templateHTML" must be a string path type';
+        throw '"templateHTML" must be a string path type';
       }
     }
 
     // This option is used independently if routes were found or not.
     if (!mountId) {
-      throw '"react-render-middleware" -> "mountId" property must be defined';
+      throw '"mountId" property must be defined';
     } else {
       if (!isString(mountId)) {
-        throw '"react-render-middleware" -> "mountId" must be a string path type';
+        throw '"mountId" must be a string path type';
       } else {
         if (!templateHTML.includes(`id="${mountId}"`)) {
-          throw '"react-render-middleware" -> "mountId" was not found in the template';
+          throw '"mountId" was not found in the template';
         }
       }
     }
@@ -58,15 +58,15 @@ module.exports = (options) => {
     if (!routes) {
       // Prepare component in case routes weren't provided in options.
       if (!componentsPath) {
-        throw '"react-render-middleware" -> "componentsPath" property must be defined';
+        throw '"componentsPath" property must be defined';
       } else {
         if (!isString(componentsPath)) {
-          throw '"react-render-middleware" -> "componentsPath" must be a string path type';
+          throw '"componentsPath" must be a string path type';
         } else {
           try {
             readdirSync(componentsPath, { encoding: 'UTF-8' });
           } catch(err) {
-            throw `\n"react-render-middleware" -> \nReason: Directory doesn't exists in the filesystem.\ncomponentsPath: "${componentsPath}"\nCode: "${err.code}"\n`;
+            throw `\n\nReason: Directory doesn't exists in the filesystem.\ncomponentsPath: "${componentsPath}"\nCode: "${err.code}"\n`;
           }
         }
       }
@@ -178,6 +178,6 @@ module.exports = (options) => {
     // Return the middleware:
     return middleware;
   } else {
-    throw '"react-render-middleware" -> Options object was not passed to the middleware.'
+    throw 'Options object was not passed to the middleware.'
   }
 }

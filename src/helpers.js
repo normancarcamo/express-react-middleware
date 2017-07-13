@@ -75,7 +75,10 @@ function avoidXSS(props) {
 function resolveComponent(path) {
   let result;
   try {
-    result = require(path).default
+    if (process.env.NODE_ENV !== "production") {
+      delete require.cache[require.resolve(path)];
+    }
+    result = require(path).default;
   } catch (err) {
     result = false;
   } finally {
