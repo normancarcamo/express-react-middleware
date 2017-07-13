@@ -11,6 +11,8 @@ const {
   resolveComponent,
   renderComponent,
   avoidXSS,
+  getComponentByPathname,
+  objectHasValues
 } = require('./helpers.js');
 
 module.exports = (options) => {
@@ -71,10 +73,10 @@ module.exports = (options) => {
 
     // Prepare the middleware:
     function middleware(req, res, next) {
-
       function prepareComponent() {
         if (routes) {
           let props = { title: 'Untitled' };
+          let component;
 
           if (arguments[0]) {
             if (isObject(arguments[0])) {
@@ -82,9 +84,20 @@ module.exports = (options) => {
             }
           }
 
-          let component = matchRoutes(options.routes, req.url)[0].route.component.default;
+          if (isArray(options.routes) && arrayHasValues(options.routes)) {
+            let matcher = matchRoutes(options.routes, req.url);
+            if (matcher && isArray(matcher) && isObject(matcher[0])) {
+              if (isObject(matcher[0].route)) {
+                if (objectHasValues(matcher[0].route.component)) {
+                  if (isFunction(matcher[0].route.component.default)) {
+                    component = matcher[0].route.component.default;
+                  }
+                }
+              }
+            }
+          }
 
-          return { component, props };
+          return { component: component, props: props };
         } else {
           if (arguments[0]) {
             if (isString(arguments[0])) {
@@ -104,13 +117,13 @@ module.exports = (options) => {
 
                 return { component, props };
               } else {
-                throw new Error('"react-render-middleware" -> component was not found in the filesystem');
+                throw 'component was not found in the filesystem';
               }
             } else {
-              throw new Error('"react-render-middleware" -> component argument must be a string type');
+              throw 'component argument must be a string type';
             }
           } else {
-            throw new Error('"react-render-middleware" -> component argument must be defined');
+            throw 'component argument must be defined';
           }
         }
       }

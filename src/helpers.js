@@ -35,6 +35,22 @@ function isArray(o) {
   return !!o && typeof o === "object" && o.length !== undefined;
 }
 
+function isReactComponent(x) {
+  return !!(x && objectHasValues(x) && ('$$typeof' in x) && (typeof x['$$typeof'] === 'symbol') && (x['$$typeof'].toString() === 'Symbol(react.element)'))
+}
+
+function objectHasValues(obj) {
+  if (typeof obj === "object") {
+    if (Object.getOwnPropertyNames(obj).length > 0) {
+      return true;
+    } else {
+      return false;
+    }
+  } else if (typeof obj === 'undefined') {
+    return false;
+  }
+}
+
 function arrayHasValues(array) {
   if (array) {
     if (isArray(array)) {
@@ -66,14 +82,45 @@ function resolveComponent(path) {
   }
 }
 
-function renderComponent(location, Component, props) {
-  let context = {}
-  let content = React.createElement(StaticRouter, { location, context }, React.createElement(Component, JSON.parse(avoidXSS(props))));
-  if (process.env.NODE_ENV === 'production') {
-    return { html: renderToStaticMarkup(content), context: context }
+function renderComponent(location, component, props) {
+  let Component;
+
+  if (!component) {
+    Component =  React.createElement('div', null, null);
+    console.info('The component you\'re trying to render seems to not exists.');
   } else {
-    return { html: renderToString(content), context: context }
+    Component = React.createElement(component, JSON.parse(avoidXSS(props)));
   }
+
+  let context = {};
+  let content = React.createElement(StaticRouter, { location, context }, Component);
+
+  if (process.env.NODE_ENV === 'production') {
+    return { html: renderToStaticMarkup(content), context: context };
+  } else {
+    return { html: renderToString(content), context: context };
+  }
+}
+
+function getComponentByPathname(routes, path) {
+  let route_ = null
+
+  function get(_path, _routes) {
+    _routes.some(route => {
+      if ('path' in route && route.path === _path) {
+        route_ = route
+        return true
+      } else {
+        if ('routes' in route) {
+          get(_path, route.routes)
+        }
+        return false
+      }
+    })
+  }
+
+  get(path, routes);
+  return route_;
 }
 
 module.exports.isFunction = isFunction;
@@ -83,7 +130,10 @@ module.exports.isUndefined = isUndefined;
 module.exports.isNull = isNull;
 module.exports.isBoolean = isBoolean;
 module.exports.isArray = isArray;
+module.exports.isReactComponent = isReactComponent;
 module.exports.arrayHasValues = arrayHasValues;
+module.exports.objectHasValues = objectHasValues;
 module.exports.avoidXSS = avoidXSS;
 module.exports.resolveComponent = resolveComponent;
 module.exports.renderComponent = renderComponent;
+module.exports.getComponentByPathname = getComponentByPathname;

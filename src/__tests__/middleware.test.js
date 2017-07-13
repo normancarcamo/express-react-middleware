@@ -95,7 +95,11 @@ describe('Wrapper', () => {
       });
       describe('With react-router', () => {
         options.routes = routes;
+        options.componentsPath = null
         middleware = reactRenderMiddleware(options);
+
+        req.url = '/about'
+
         middleware(req, res, next);
 
         describe('Synchronous', () => {
