@@ -5,8 +5,7 @@
   "main": "index.js",
   "license": "UNLICENSED",
   "scripts": {
-    "test": "./node_modules/.bin/jest --config jest.config.json",
-    "build": "./node_modules/.bin/babel ./src/middleware.js --out-file ./index.js --source-maps inline --minified --compact"
+    "test": "./node_modules/.bin/jest --config jest.config.json"
   },
   "repository": {
     "type": "git",

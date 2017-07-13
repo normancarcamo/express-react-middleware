@@ -4,7 +4,7 @@ import { readFileSync } from 'fs'
 import cheerio from 'cheerio'
 import sinon from 'sinon'
 import reactRenderMiddleware from '../middleware.js';
-import routes from '../../example/routes'
+import routes from '../../examples/test/routes'
 
 /* Custom matchers: */
 import * as matchers from '../matchers';
@@ -25,13 +25,13 @@ describe('Wrapper', () => {
   let options = {
     templateHTML: (() => {
       try {
-        return readFileSync(root('example/index.html'), { encoding: 'UTF-8' });
+        return readFileSync(root('examples/test/index.html'), { encoding: 'UTF-8' });
       } catch (err) {
         throw err;
       }
     })(),
     mountId: mount,
-    componentsPath: root('example/components'),
+    componentsPath: root('examples/test/components'),
   };
   let middleware = reactRenderMiddleware(options);
 
