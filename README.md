@@ -194,4 +194,4 @@ app.get('/contact', (req, res) => {
 ![Image of Tests](https://github.com/normancarcamo/express-react-middleware/blob/master/tests_preview.png)
 
 ## Examples:
-See [examples folder](https://github.com/normancarcamo/express-react-middleware/tree/master/example)
+See [examples folder](https://github.com/normancarcamo/express-react-middleware/tree/master/examples)
