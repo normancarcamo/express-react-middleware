@@ -189,7 +189,9 @@ app.get('/contact', (req, res) => {
 });
 ```
 ## Tests:
-`` npm run test ``
+`` npm run test ``<br/>
+
+![Image of Tests](https://github.com/normancarcamo/express-react-middleware/blob/master/tests_preview.png)
 
 ## Examples:
 See [examples folder](https://github.com/normancarcamo/express-react-middleware/tree/master/example)
