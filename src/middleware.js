@@ -11,8 +11,9 @@ const {
   resolveComponent,
   renderComponent,
   avoidXSS,
+  objectHasValues,
   getComponentByPathname,
-  objectHasValues
+  getComponentFromRoutes,
 } = require('./helpers.js');
 
 module.exports = (options) => {
@@ -73,6 +74,7 @@ module.exports = (options) => {
 
     // Prepare the middleware:
     function middleware(req, res, next) {
+
       function prepareComponent() {
         if (routes) {
           let props = { title: 'Untitled' };
@@ -84,20 +86,10 @@ module.exports = (options) => {
             }
           }
 
-          if (isArray(options.routes) && arrayHasValues(options.routes)) {
-            let matcher = matchRoutes(options.routes, req.url);
-            if (matcher && isArray(matcher) && isObject(matcher[0])) {
-              if (isObject(matcher[0].route)) {
-                if (objectHasValues(matcher[0].route.component)) {
-                  if (isFunction(matcher[0].route.component.default)) {
-                    component = matcher[0].route.component.default;
-                  }
-                }
-              }
-            }
-          }
+          component = getComponentFromRoutes(options.routes, req.url).Component;
+          props.rr = true
 
-          return { component: component, props: props };
+          return { component, props };
         } else {
           if (arguments[0]) {
             if (isString(arguments[0])) {
@@ -114,6 +106,8 @@ module.exports = (options) => {
                     }
                   }
                 }
+
+                props.rr = false
 
                 return { component, props };
               } else {

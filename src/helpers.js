@@ -1,6 +1,7 @@
 const React = require('react');
 const { StaticRouter } = require('react-router');
 const { renderToString, renderToStaticMarkup } = require('react-dom/server');
+const { matchRoutes } = require('react-router-config');
 
 function isFunction(x) {
   return Object.prototype.toString.call(x) == '[object Function]';
@@ -123,6 +124,48 @@ function getComponentByPathname(routes, path) {
   return route_;
 }
 
+function getComponentFromRoutes(routes, url, props) {
+  let output = {};
+
+  if (arrayHasValues(routes)) {
+    let branch = matchRoutes(routes, url);
+    if (arrayHasValues(branch)) {
+      if (objectHasValues(branch[0])) {
+        if (objectHasValues(branch[0].route)) {
+          if (objectHasValues(branch[0].route.component)) {
+            if (isFunction(branch[0].route.component.default)) {
+              // Default component found:
+              output.Component = branch[0].route.component.default;
+              output.isExact = true;
+              output.found = true;
+
+              // Check if the component dont exists:
+              if (objectHasValues(branch[1]) && objectHasValues(branch[1].match) && !branch[1].match.isExact) {
+                let found = getComponentByPathname(routes, url);
+                if (found && objectHasValues(found) && objectHasValues(found.component) && isFunction(found.component.default)) {
+                  output.isExact = false;
+                  output.found = true;
+                  output.Component = found.component.default;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  if (isBrowser()) {
+    output.element = React.createElement(output.Component, JSON.parse(avoidXSS(props || {})));
+  }
+
+  return output;
+}
+
+function isBrowser() {
+  return typeof window !== 'undefined';
+}
+
 module.exports.isFunction = isFunction;
 module.exports.isString = isString;
 module.exports.isObject = isObject;
@@ -137,3 +180,5 @@ module.exports.avoidXSS = avoidXSS;
 module.exports.resolveComponent = resolveComponent;
 module.exports.renderComponent = renderComponent;
 module.exports.getComponentByPathname = getComponentByPathname;
+module.exports.getComponentFromRoutes = getComponentFromRoutes;
+module.exports.isBrowser = isBrowser;
