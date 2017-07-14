@@ -189,9 +189,18 @@ app.get('/contact', (req, res) => {
 });
 ```
 ## Tests:
-`` npm run test ``<br/>
-
+``` bash
+npm run test
+```
 ![Image of Tests](https://github.com/normancarcamo/express-react-middleware/blob/master/tests_preview.png)
+<br/>
+:+1:
 
 ## Examples:
 See [examples folder](https://github.com/normancarcamo/express-react-middleware/tree/master/examples)
+
+## Maintainers:
+
+![Image of Mantainer](http://s.gravatar.com/avatar/c3d34f6dbeeef3c39942d0ecb1247228?s=80)<br/>
+[Norman Carcamo](https://github.com/normancarcamo)<br/>
+[NPM - modules](https://www.npmjs.com/~normanfx)<br/>
