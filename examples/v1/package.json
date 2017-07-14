@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "express": "^4.15.3",
-    "express-react-middleware": "^1.0.5",
+    "express-react-middleware": "^1.0.6",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-dom": "^15.6.1",
