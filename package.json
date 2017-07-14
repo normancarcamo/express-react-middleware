@@ -5,7 +5,8 @@
   "main": "index.js",
   "license": "UNLICENSED",
   "scripts": {
-    "test": "./node_modules/.bin/jest --config jest.config.json"
+    "test": "./node_modules/.bin/jest --config jest.config.json",
+    "compile:helpers": "node_modules/.bin/babel src/_helpers.js --out-file src/helpers.js"
   },
   "repository": {
     "type": "git",

@@ -1,34 +1,22 @@
-'use strict';
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
-
-var React = require('react');
-
-var _require = require('react-router'),
-    StaticRouter = _require.StaticRouter;
-
-var _require2 = require('react-dom/server'),
-    renderToString = _require2.renderToString,
-    renderToStaticMarkup = _require2.renderToStaticMarkup;
-
-var _require3 = require('react-router-config'),
-    renderRoutes = _require3.renderRoutes,
-    matchRoutes = _require3.matchRoutes;
+const React = require('react');
+const { StaticRouter } = require('react-router');
+const { renderToString, renderToStaticMarkup } = require('react-dom/server');
+const { renderRoutes, matchRoutes } = require('react-router-config');
 
 function isFunction(x) {
   return Object.prototype.toString.call(x) == '[object Function]';
 }
 
 function isString(input) {
-  return typeof input === "string" ? true : false;
+  return (typeof input === "string") ? true : false;
 }
 
 function isObject(value) {
   if (Object.prototype.toString.call(value) !== '[object Object]') {
-    return false;
+    return false
   } else {
-    var prototype = Object.getPrototypeOf(value);
-    return prototype === null || prototype === Object.prototype;
+    var prototype = Object.getPrototypeOf(value)
+    return prototype === null || prototype === Object.prototype
   }
 }
 
@@ -45,15 +33,15 @@ function isBoolean(value) {
 }
 
 function isArray(o) {
-  return !!o && (typeof o === 'undefined' ? 'undefined' : _typeof(o)) === "object" && o.length !== undefined;
+  return !!o && typeof o === "object" && o.length !== undefined;
 }
 
 function isReactComponent(x) {
-  return !!(x && objectHasValues(x) && '$$typeof' in x && _typeof(x['$$typeof']) === 'symbol' && x['$$typeof'].toString() === 'Symbol(react.element)');
+  return !!(x && objectHasValues(x) && ('$$typeof' in x) && (typeof x['$$typeof'] === 'symbol') && (x['$$typeof'].toString() === 'Symbol(react.element)'))
 }
 
 function objectHasValues(obj) {
-  if ((typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === "object") {
+  if (typeof obj === "object") {
     if (Object.getOwnPropertyNames(obj).length > 0) {
       return true;
     } else {
@@ -68,15 +56,15 @@ function arrayHasValues(array) {
   if (array) {
     if (isArray(array)) {
       if (array.length) {
-        return true;
+        return true
       } else {
-        return false;
+        return false
       }
     } else {
-      return false;
+      return false
     }
   } else {
-    return false;
+    return false
   }
 }
 
@@ -85,7 +73,7 @@ function avoidXSS(props) {
 }
 
 function resolveComponent(path) {
-  var result = void 0;
+  let result;
   try {
     if (process.env.NODE_ENV !== "production") {
       delete require.cache[require.resolve(path)];
@@ -99,10 +87,10 @@ function resolveComponent(path) {
 }
 
 function renderComponent(location, component, props) {
-  var Component = void 0;
+  let Component;
 
   if (!component) {
-    Component = React.createElement('div', null, null);
+    Component =  React.createElement('div', null, null);
     if (process.env.NODE_ENV !== 'production') {
       console.info('The component you\'re trying to render seems to not exists.');
     }
@@ -110,8 +98,8 @@ function renderComponent(location, component, props) {
     Component = React.createElement(component, JSON.parse(avoidXSS(props)));
   }
 
-  var context = {};
-  var content = React.createElement(StaticRouter, { location: location, context: context }, Component);
+  let context = {};
+  let content = React.createElement(StaticRouter, { location, context }, Component);
 
   if (process.env.NODE_ENV === 'production') {
     return { html: renderToStaticMarkup(content), context: context };
@@ -121,20 +109,20 @@ function renderComponent(location, component, props) {
 }
 
 function getComponentByPathname(routes, path) {
-  var route_ = null;
+  let route_ = null
 
   function get(_path, _routes) {
-    _routes.some(function (route) {
+    _routes.some(route => {
       if ('path' in route && route.path === _path) {
-        route_ = route;
-        return true;
+        route_ = route
+        return true
       } else {
         if ('routes' in route) {
-          get(_path, route.routes);
+          get(_path, route.routes)
         }
-        return false;
+        return false
       }
-    });
+    })
   }
 
   get(path, routes);
@@ -142,10 +130,10 @@ function getComponentByPathname(routes, path) {
 }
 
 function getComponentFromRoutes(routes, url, props) {
-  var output = {};
+  let output = {};
 
   if (arrayHasValues(routes)) {
-    var branch = matchRoutes(routes, url);
+    let branch = matchRoutes(routes, url);
     if (arrayHasValues(branch)) {
       if (objectHasValues(branch[0])) {
         if (objectHasValues(branch[0].route)) {
@@ -158,7 +146,7 @@ function getComponentFromRoutes(routes, url, props) {
 
               // Check if the component dont exists:
               if (objectHasValues(branch[1]) && objectHasValues(branch[1].match) && !branch[1].match.isExact) {
-                var found = getComponentByPathname(routes, url);
+                let found = getComponentByPathname(routes, url);
                 if (found && objectHasValues(found) && objectHasValues(found.component) && isFunction(found.component.default)) {
                   output.isExact = false;
                   output.found = true;
@@ -173,11 +161,11 @@ function getComponentFromRoutes(routes, url, props) {
 
             // Check if the component dont exists:
             if (objectHasValues(branch[1]) && objectHasValues(branch[1].match) && !branch[1].match.isExact) {
-              var _found = getComponentByPathname(routes, url);
-              if (_found && objectHasValues(_found) && objectHasValues(_found.component) && isFunction(_found.component.default)) {
+              let found = getComponentByPathname(routes, url);
+              if (found && objectHasValues(found) && objectHasValues(found.component) && isFunction(found.component.default)) {
                 output.isExact = false;
                 output.found = true;
-                output.Component = _found.component.default;
+                output.Component = found.component.default;
               }
             }
           }
@@ -189,7 +177,7 @@ function getComponentFromRoutes(routes, url, props) {
           if (isFunction(routes[0].component)) {
             output.isExact = false;
             output.found = true;
-            output.Component = routes[0].component;
+            output.Component = routes[0].component
           }
         }
       }
