@@ -192,7 +192,7 @@ app.get('/contact', (req, res) => {
 ``` bash
 npm run test
 ```
-![Image of Tests](https://github.com/normancarcamo/express-react-middleware/blob/master/tests_preview.png)
+![Image of Tests](https://raw.githubusercontent.com/normancarcamo/express-react-middleware/master/tests_preview.png)
 <br/>
 :+1:
 
