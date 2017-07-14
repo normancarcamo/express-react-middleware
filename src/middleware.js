@@ -86,8 +86,9 @@ module.exports = (options) => {
             }
           }
 
+          let s = getComponentFromRoutes(options.routes, req.url)
           component = getComponentFromRoutes(options.routes, req.url).Component;
-          props.rr = true
+          props.rr = true;
 
           return { component, props };
         } else {
