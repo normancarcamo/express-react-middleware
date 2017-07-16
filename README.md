@@ -4,6 +4,12 @@ A middleware able to render react components in your server with node.js as view
 ## Why?
 Have you ever saw that whenever you're making a new project or when an existing project have to be updated you must to follow and do a lot of steps to achieve the desired outcome in the server when you want to apply SSR? Well, this middleware avoid having to remember all those steps even react-router.
 
+## What are the target projects?
+- For existing projects.
+- For new projects.
+- Projects who want to have better control of what components needs to be rendered in a specific resource.
+- Projects who want to update their old configurations.
+
 ## Pre-requisites
   1. A html file to use as template.
   2. The html file must include a div or any element with an id attribute to mount the component.
@@ -20,7 +26,7 @@ or
 There are 2 ways to use it in and is using a routes config file or by resolving the components.
 
 #### template
-``The template is just an html file with a basic markup like this:``
+The template is just an html file with a basic markup like this:
 ```html
 <!DOCTYPE html>
 <html>
@@ -39,7 +45,7 @@ There are 2 ways to use it in and is using a routes config file or by resolving 
 </html>
 ```
 
-``This is an example of how to require a template (synchronous, recommended way):``
+This is an example of how to require a template *(synchronous, recommended way)*:
 
 ```javascript
 import { readFileSync } from 'fs'
@@ -55,7 +61,6 @@ let template = (() => {
     throw err;
   }
 })();
-
 ```
 
 #### options
@@ -67,7 +72,7 @@ let template = (() => {
 | **componentsPath** | string | √ | (√/x) | √ | √ | Here you have to pass the absolute path to locate the components. (required if **routes** option is not set)  If routes option is present this option is ignored.
 | **routes** | array | √ | (√/x) | √ | √ | the routes file used in react-router to match and render the components. (required if **componentsPath** is not set)
 
-`` Example of how the options should be written: ``
+Example of how the options should be written:
 
 ```javascript
 
