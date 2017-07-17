@@ -94,7 +94,7 @@ import routes from './routes'
 let options = {
   templateHTML: template,
   mountId: "root",
-  routes: { collection: routes }
+  routes: { collection: routes, /*extractComponent: boolean, default false*/ }
 };
 ```
 
