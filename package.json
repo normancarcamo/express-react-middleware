@@ -1,9 +1,9 @@
 {
   "name": "express-react-middleware",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "Render react components from the server as views",
   "main": "index.js",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "scripts": {
     "test": "./node_modules/.bin/jest --config jest.config.json",
     "compile:helpers": "node_modules/.bin/babel src/_helpers.js --out-file src/helpers.js"
