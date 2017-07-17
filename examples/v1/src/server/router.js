@@ -3,7 +3,6 @@ import { resolve } from 'path'
 import { readFileSync } from 'fs'
 import middleware from 'express-react-middleware'
 import routes from '../shared/routes'
-import { getRoute } from '../shared/helpers';
 
 const router = Router()
 
@@ -73,7 +72,7 @@ router.get('/three', (req, res) => {
 router.use(middleware({
   templateHTML: template,
   mountId: 'root',
-  routes: routes
+  routes: { collection: routes }
 }));
 
 router.get('*', (req, res) => {
