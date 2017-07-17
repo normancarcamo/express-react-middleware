@@ -94,7 +94,7 @@ describe('Wrapper', () => {
         });
       });
       describe('With react-router', () => {
-        options.routes = routes;
+        options.routes = { collection: routes };
         options.componentsPath = null
         middleware = reactRenderMiddleware(options);
 

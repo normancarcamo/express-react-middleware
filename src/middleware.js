@@ -1,33 +1,175 @@
-const React = require('react');
-const { readdirSync } = require('fs');
-const { resolve } = require('path');
-const { renderRoutes, matchRoutes } = require('react-router-config');
-const {
-  isObject,
-  isFunction,
-  isString,
-  isArray,
-  arrayHasValues,
-  resolveComponent,
-  renderComponent,
-  avoidXSS,
-  objectHasValues,
-  getComponentByPathname,
-  getComponentFromRoutes,
-} = require('./helpers.js');
+'use strict';
 
-module.exports = (options) => {
+var React = require('react');
+
+var _require = require('fs'),
+    readdirSync = _require.readdirSync;
+
+var _require2 = require('path'),
+    resolve = _require2.resolve;
+
+var _require3 = require('react-router-config'),
+    renderRoutes = _require3.renderRoutes,
+    matchRoutes = _require3.matchRoutes;
+
+var _require4 = require('./helpers.js'),
+    isObject = _require4.isObject,
+    isFunction = _require4.isFunction,
+    isString = _require4.isString,
+    isArray = _require4.isArray,
+    isBoolean = _require4.isBoolean,
+    arrayHasValues = _require4.arrayHasValues,
+    resolveComponent = _require4.resolveComponent,
+    renderComponent = _require4.renderComponent,
+    avoidXSS = _require4.avoidXSS,
+    objectHasValues = _require4.objectHasValues,
+    getComponentByPathname = _require4.getComponentByPathname,
+    getComponentFromRoutes = _require4.getComponentFromRoutes;
+
+module.exports = function (options) {
   if (isObject(options)) {
 
+    // Prepare the middleware:
+    var middleware = function middleware(req, res, next) {
+
+      function prepareComponent() {
+        if (routes) {
+          var props = { title: 'Untitled' };
+
+          if (arguments[0]) {
+            if (isObject(arguments[0])) {
+              props = Object.assign(props, arguments[0]);
+            }
+          }
+
+          var results = getComponentFromRoutes(options.routes.collection, req.url, props, extract);
+          results.reactRouter = true;
+
+          return { component: results.Component, props: results };
+        } else {
+          if (arguments[0]) {
+            if (isString(arguments[0])) {
+              /* Require the component: */
+              var component = resolveComponent(resolve(componentsPath, arguments[0]));
+
+              if (component) {
+                var _props = { title: 'Untitled' };
+
+                if (arguments.length === 3 && isFunction(arguments[arguments.length - 1])) {
+                  if (arguments[1]) {
+                    if (isObject(arguments[1])) {
+                      _props = Object.assign(_props, arguments[1]);
+                    }
+                  }
+                }
+
+                return { component: component, props: { reactRouter: false, props: _props } };
+              } else {
+                throw 'component was not found in the filesystem';
+              }
+            } else {
+              throw 'component argument must be a string type';
+            }
+          } else {
+            throw 'component argument must be defined';
+          }
+        }
+      }
+
+      function prepareContent(url, component, props, template, id) {
+        // -------------------------------------------------------- Content:
+        var content = renderComponent(url, component, props);
+        var $ = require('cheerio').load(template);
+        $('title').text(props.props.title);
+        $('head').append('<script id="__initial_state__">window.__INITIAL_STATE__ = ' + avoidXSS(props) + ';</script>');
+        $('#' + id).html(content.html);
+
+        // -------------------------------------------------------- Return:
+        return {
+          html: $.html(),
+          context: content.context,
+          component: {
+            original: component,
+            rendered: content.html
+          },
+          props: {
+            original: props.props,
+            stringify: avoidXSS(props.props)
+          },
+          template: template,
+          changes: {
+            title: $('title').html(),
+            state: $('#__initial_state__').html(),
+            mount: $('#' + id).html()
+          }
+        };
+      }
+
+      function prepareResults(results, callback) {
+        if (isFunction(callback)) {
+          return callback(results);
+        } else {
+          return results;
+        }
+      }
+
+      // Description: Add a new function called "render" to the req object:
+      req.render = function render() {
+        // ---------------------------------------------------------- Component & Props:
+        var _prepareComponent = prepareComponent.apply(undefined, arguments),
+            component = _prepareComponent.component,
+            props = _prepareComponent.props;
+
+        // ---------------------------------------------------------- Content:
+
+
+        var results = prepareContent(req.url, component, props, templateHTML, mountId);
+
+        // ---------------------------------------------------------- Return:
+        return prepareResults(results, arguments[arguments.length - 1]);
+      };
+
+      // Call next:
+      return next();
+    };
+
     // Get variables from options (if they were passed...)
-    let { templateHTML, mountId, componentsPath } = options, routes = false;
+    var templateHTML = options.templateHTML,
+        mountId = options.mountId,
+        componentsPath = options.componentsPath,
+        routes = false,
+        extract = false;
 
     // Check if routes option is valid:
-    if (('routes' in options)) {
-      if (!isArray(options.routes)) {
-        throw new Error('"routes" property must be an array.');
+
+    if ('routes' in options) {
+      if (!isObject(options.routes)) {
+        throw '"routes" property must be an object.';
+      } else {
+        if ('collection' in options.routes) {
+          if (!isArray(options.routes.collection)) {
+            throw '"collection" property must be an array type.';
+          }
+        } else {
+          throw '"routes" property must have a "collection" property.';
+        }
+
+        if ('extractComponent' in options.routes) {
+          if (!isBoolean(options.routes.extractComponent)) {
+            throw '"extractComponent" property must be a boolean type.';
+          } else {
+            extract = options.routes.extractComponent;
+          }
+        } else {
+          extract = false;
+        }
       }
-      if (arrayHasValues(options.routes)) {
+
+      // if (!isArray(options.routes)) {
+      //   throw new Error('"routes" property must be an array.');
+      // }
+
+      if (arrayHasValues(options.routes.collection)) {
         routes = true;
       }
     }
@@ -48,7 +190,7 @@ module.exports = (options) => {
       if (!isString(mountId)) {
         throw '"mountId" must be a string path type';
       } else {
-        if (!templateHTML.includes(`id="${mountId}"`)) {
+        if (!templateHTML.includes('id="' + mountId + '"')) {
           throw '"mountId" was not found in the template';
         }
       }
@@ -65,120 +207,16 @@ module.exports = (options) => {
         } else {
           try {
             readdirSync(componentsPath, { encoding: 'UTF-8' });
-          } catch(err) {
-            throw `\n\nReason: Directory doesn't exists in the filesystem.\ncomponentsPath: "${componentsPath}"\nCode: "${err.code}"\n`;
+          } catch (err) {
+            throw '\n\nReason: Directory doesn\'t exists in the filesystem.\ncomponentsPath: "' + componentsPath + '"\nCode: "' + err.code + '"\n';
           }
         }
       }
-    }
-
-    // Prepare the middleware:
-    function middleware(req, res, next) {
-
-      function prepareComponent() {
-        if (routes) {
-          let props = { title: 'Untitled' };
-          let component;
-
-          if (arguments[0]) {
-            if (isObject(arguments[0])) {
-              props = Object.assign(props, arguments[0]);
-            }
-          }
-
-          let s = getComponentFromRoutes(options.routes, req.url)
-          component = getComponentFromRoutes(options.routes, req.url).Component;
-          props.rr = true;
-
-          return { component, props };
-        } else {
-          if (arguments[0]) {
-            if (isString(arguments[0])) {
-              /* Require the component: */
-              let component = resolveComponent(resolve(componentsPath, arguments[0]));
-
-              if (component) {
-                let props = { title: 'Untitled' };
-
-                if (arguments.length === 3 && isFunction(arguments[arguments.length-1])) {
-                  if (arguments[1]) {
-                    if (isObject(arguments[1])) {
-                      props = Object.assign(props, arguments[1]);
-                    }
-                  }
-                }
-
-                props.rr = false
-
-                return { component, props };
-              } else {
-                throw 'component was not found in the filesystem';
-              }
-            } else {
-              throw 'component argument must be a string type';
-            }
-          } else {
-            throw 'component argument must be defined';
-          }
-        }
-      }
-
-      function prepareContent(url, component, props, template, id) {
-        // -------------------------------------------------------- Content:
-        let content = renderComponent(url, component, props);
-        let $ = require('cheerio').load(template);
-        $('title').text(props.title);
-        $('head').append(`<script id="__initial_state__">window.__INITIAL_STATE__ = ${avoidXSS(props)}</script>`);
-        $(`#${id}`).html(content.html);
-
-        // -------------------------------------------------------- Return:
-        return {
-          html: $.html(),
-          context: content.context,
-          component: {
-            original: component,
-            rendered: content.html,
-          },
-          props: {
-            original: props,
-            stringify: avoidXSS(props)
-          },
-          template: template,
-          changes: {
-            title: $('title').html(),
-            state: $('#__initial_state__').html(),
-            mount: $(`#${id}`).html()
-          },
-        };
-      }
-
-      function prepareResults(results, callback) {
-        if (isFunction(callback)) {
-          return callback(results);
-        } else {
-          return results
-        }
-      }
-
-      // Description: Add a new function called "render" to the req object:
-      req.render = function render() {
-        // ---------------------------------------------------------- Component & Props:
-        let { component, props } = prepareComponent(...arguments);
-
-        // ---------------------------------------------------------- Content:
-        let results = prepareContent(req.url, component, props, templateHTML, mountId);
-
-        // ---------------------------------------------------------- Return:
-        return prepareResults(results, arguments[arguments.length-1]);
-      };
-
-      // Call next:
-      return next();
     };
 
     // Return the middleware:
     return middleware;
   } else {
-    throw 'Options object was not passed to the middleware.'
+    throw 'Options object was not passed to the middleware.';
   }
-}
+};

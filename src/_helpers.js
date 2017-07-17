@@ -130,53 +130,48 @@ function getComponentByPathname(routes, path) {
 }
 
 function getComponentFromRoutes(routes, url, props) {
-  let output = {};
+  let extract = isBoolean(arguments[arguments.length -1]) ? arguments[arguments.length -1] : false;
+  let output = { url, props, extract };
 
   if (arrayHasValues(routes)) {
     let branch = matchRoutes(routes, url);
     if (arrayHasValues(branch)) {
-      if (objectHasValues(branch[0])) {
-        if (objectHasValues(branch[0].route)) {
-          if (objectHasValues(branch[0].route.component)) {
-            if (isFunction(branch[0].route.component.default)) {
-              // Default component found:
-              output.Component = branch[0].route.component.default;
-              output.isExact = true;
-              output.found = true;
+      if (extract) {
+        if (objectHasValues(branch[0])) {
+          if (objectHasValues(branch[0].route)) {
+            if (objectHasValues(branch[0].route.component)) {
+              if (isFunction(branch[0].route.component.default)) {
+                // Default component found:
+                output.Component = branch[0].route.component.default;
+
+                // Check if the component dont exists:
+                if (objectHasValues(branch[1]) && objectHasValues(branch[1].match) && !branch[1].match.isExact) {
+                  let found = getComponentByPathname(routes, url);
+                  if (found && objectHasValues(found) && objectHasValues(found.component) && isFunction(found.component.default)) {
+                    output.Component = found.component.default;
+                  }
+                }
+              }
+            } else if (isFunction(branch[0].route.component)) {
+              output.Component = branch[0].route.component;
 
               // Check if the component dont exists:
               if (objectHasValues(branch[1]) && objectHasValues(branch[1].match) && !branch[1].match.isExact) {
                 let found = getComponentByPathname(routes, url);
                 if (found && objectHasValues(found) && objectHasValues(found.component) && isFunction(found.component.default)) {
-                  output.isExact = false;
-                  output.found = true;
                   output.Component = found.component.default;
                 }
               }
             }
-          } else if (isFunction(branch[0].route.component)) {
-            output.Component = branch[0].route.component;
-            output.isExact = true;
-            output.found = true;
-
-            // Check if the component dont exists:
-            if (objectHasValues(branch[1]) && objectHasValues(branch[1].match) && !branch[1].match.isExact) {
-              let found = getComponentByPathname(routes, url);
-              if (found && objectHasValues(found) && objectHasValues(found.component) && isFunction(found.component.default)) {
-                output.isExact = false;
-                output.found = true;
-                output.Component = found.component.default;
-              }
-            }
           }
         }
+      } else {
+        output.Component = branch[0].route.component.default;
       }
     } else {
       if (isArray(routes) && arrayHasValues(routes) && routes.length === 1) {
         if (isObject(routes[0]) && objectHasValues(routes[0])) {
           if (isFunction(routes[0].component)) {
-            output.isExact = false;
-            output.found = true;
             output.Component = routes[0].component
           }
         }
