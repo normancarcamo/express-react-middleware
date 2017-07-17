@@ -6,7 +6,9 @@
   "license": "MIT",
   "scripts": {
     "test": "./node_modules/.bin/jest --config jest.config.json",
-    "compile:helpers": "node_modules/.bin/babel src/_helpers.js --out-file src/helpers.js"
+    "compile:helpers": "node_modules/.bin/babel src/_helpers.js --out-file src/helpers.js",
+    "compile:middleware": "node_modules/.bin/babel src/_middleware.js --out-file src/middleware.js",
+    "compile": "npm run compile:helpers && npm run compile:middleware"
   },
   "repository": {
     "type": "git",
