@@ -166,7 +166,11 @@ function getComponentFromRoutes(routes, url, props) {
           }
         }
       } else {
-        output.Component = branch[0].route.component.default;
+        if (branch[0].route.component.default) {
+          output.Component = branch[0].route.component.default;
+        } else {
+          output.Component = branch[0].route.component;
+        }
       }
     } else {
       if (isArray(routes) && arrayHasValues(routes) && routes.length === 1) {
