@@ -107,7 +107,7 @@ function renderComponent(location, component, props) {
       console.info('The component you\'re trying to render seems to not exists.');
     }
   } else {
-    Component = React.createElement(component, JSON.parse(avoidXSS(props)));
+    Component = React.createElement(component, JSON.parse(avoidXSS(props.props)));
   }
 
   var context = {};
