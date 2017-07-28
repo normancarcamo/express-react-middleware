@@ -211,11 +211,9 @@ function syncRouter(arrayRoutes, defaultComponent) {
   var component = null;
 
   if (isBrowser) {
-    console.log('Browser ok');
     var router = window.__INITIAL_STATE__ && window.__INITIAL_STATE__.reactRouter;
 
     if (router) {
-      console.log('Router ok');
       var _window$__INITIAL_STA = window.__INITIAL_STATE__,
           url = _window$__INITIAL_STA.url,
           props = _window$__INITIAL_STA.props,
@@ -234,8 +232,6 @@ function syncRouter(arrayRoutes, defaultComponent) {
 
         component = Component;
       }
-    } else {
-      console.log('Router was not found.');
     }
   }
 
