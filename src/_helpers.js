@@ -194,6 +194,39 @@ function isBrowser() {
   return typeof window !== 'undefined';
 }
 
+function syncRouter(arrayRoutes, defaultComponent) {
+  let properties = {};
+  let component = null
+
+  if (isBrowser) {
+    console.log('Browser ok');
+    let router = window.__INITIAL_STATE__ && window.__INITIAL_STATE__.reactRouter;
+
+    if (router) {
+      console.log('Router ok');
+      let { url, props, extract } = window.__INITIAL_STATE__;
+
+      // Get properties:
+      if (isObject(props)) {
+        properties = props;
+      }
+
+      // Get Component:
+      if (arrayRoutes && isArray(arrayRoutes) && arrayHasValues(arrayRoutes) && isString(url)) {
+        let { Component } = getComponentFromRoutes(arrayRoutes, url, properties, extract);
+        component = Component;
+      }
+    } else {
+      console.log('Router was not found.');
+    }
+  }
+
+  return {
+    Component: component || defaultComponent || null,
+    props: properties
+  };
+}
+
 module.exports.isFunction = isFunction;
 module.exports.isString = isString;
 module.exports.isObject = isObject;
@@ -210,3 +243,4 @@ module.exports.renderComponent = renderComponent;
 module.exports.getComponentByPathname = getComponentByPathname;
 module.exports.getComponentFromRoutes = getComponentFromRoutes;
 module.exports.isBrowser = isBrowser;
+module.exports.syncRouter = syncRouter;

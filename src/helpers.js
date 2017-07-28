@@ -206,6 +206,45 @@ function isBrowser() {
   return typeof window !== 'undefined';
 }
 
+function syncRouter(arrayRoutes, defaultComponent) {
+  var properties = {};
+  var component = null;
+
+  if (isBrowser) {
+    console.log('Browser ok');
+    var router = window.__INITIAL_STATE__ && window.__INITIAL_STATE__.reactRouter;
+
+    if (router) {
+      console.log('Router ok');
+      var _window$__INITIAL_STA = window.__INITIAL_STATE__,
+          url = _window$__INITIAL_STA.url,
+          props = _window$__INITIAL_STA.props,
+          extract = _window$__INITIAL_STA.extract;
+
+      // Get properties:
+
+      if (isObject(props)) {
+        properties = props;
+      }
+
+      // Get Component:
+      if (arrayRoutes && isArray(arrayRoutes) && arrayHasValues(arrayRoutes) && isString(url)) {
+        var _getComponentFromRout = getComponentFromRoutes(arrayRoutes, url, properties, extract),
+            Component = _getComponentFromRout.Component;
+
+        component = Component;
+      }
+    } else {
+      console.log('Router was not found.');
+    }
+  }
+
+  return {
+    Component: component || defaultComponent || null,
+    props: properties
+  };
+}
+
 module.exports.isFunction = isFunction;
 module.exports.isString = isString;
 module.exports.isObject = isObject;
@@ -222,3 +261,4 @@ module.exports.renderComponent = renderComponent;
 module.exports.getComponentByPathname = getComponentByPathname;
 module.exports.getComponentFromRoutes = getComponentFromRoutes;
 module.exports.isBrowser = isBrowser;
+module.exports.syncRouter = syncRouter;
