@@ -2,6 +2,8 @@ const React = require('react');
 const { StaticRouter } = require('react-router');
 const { renderToString, renderToStaticMarkup } = require('react-dom/server');
 const { renderRoutes, matchRoutes } = require('react-router-config');
+const { BrowserRouter, HashRouter } = require('react-router-dom');
+const { render } = require('react-dom');
 
 function isFunction(x) {
   return Object.prototype.toString.call(x) == '[object Function]';
@@ -184,7 +186,9 @@ function getComponentFromRoutes(routes, url, props) {
   }
 
   if (isBrowser()) {
-    output.element = React.createElement(output.Component, JSON.parse(avoidXSS(props || {})));
+    let Comp = output.Component;
+    output.element = <Comp {...avoidXSS(props || {})} />
+    //output.element = React.createElement(output.Component, JSON.parse(avoidXSS(props || {})));
   }
 
   return output;
@@ -198,29 +202,70 @@ function syncRouter(arrayRoutes, defaultComponent) {
   let properties = {};
   let component = null
 
-  if (isBrowser) {
-    let router = window.__INITIAL_STATE__ && window.__INITIAL_STATE__.reactRouter;
+  let router = window.__INITIAL_STATE__ && window.__INITIAL_STATE__.reactRouter;
 
-    if (router) {
-      let { url, props, extract } = window.__INITIAL_STATE__;
+  if (router) {
+    let { url, props, extract } = window.__INITIAL_STATE__;
 
-      // Get properties:
-      if (isObject(props)) {
-        properties = props;
-      }
+    // Get properties:
+    if (isObject(props)) {
+      properties = props;
+    }
 
-      // Get Component:
-      if (arrayRoutes && isArray(arrayRoutes) && arrayHasValues(arrayRoutes) && isString(url)) {
-        let { Component } = getComponentFromRoutes(arrayRoutes, url, properties, extract);
-        component = Component;
-      }
+    // Get Component:
+    if (arrayRoutes && isArray(arrayRoutes) && arrayHasValues(arrayRoutes) && isString(url)) {
+      let { Component } = getComponentFromRoutes(arrayRoutes, url, properties, extract);
+      component = Component;
     }
   }
 
-  return {
+  const output = {
+    Router: window.location.origin.startsWith("file://") ? HashRouter : BrowserRouter,
     Component: component || defaultComponent || null,
-    props: properties
+    props: properties,
+    refresh: !('pushState' in window.history),
+    render: render,
   };
+
+  removeInitialState();
+  disableLogHMR();
+
+  if (isFunction(arguments[arguments.length -1])) {
+    return arguments[arguments.length -1](output)
+  } else {
+    return output;
+  }
+}
+
+function removeInitialState() {
+  if (isBrowser()) {
+    var parent = window.document.querySelector('head');
+    var child = window.document.getElementById('__initial_state__');
+    if (child) {
+      parent.removeChild(child);
+    }
+    window.__INITIAL_STATE__ = null;
+  }
+}
+
+function disableLogHMR() {
+  if (isBrowser()) {
+    if (process.env.NODE_ENV === 'development') {
+      // This is a workaround used alongside the webpack-dev-server hot-module-reload feature
+      //  - it's quite chatty on the console, and there's no currently no configuration option
+      //    to silence it. Only used in development.
+      // Prevent messages starting with [HMR] or [WDS] from being printed to the console
+      (function(global) {
+        let console_log = global.console.log
+        global.console.log = function() {
+          if (!(arguments.length == 1 && typeof arguments[0] === 'string' && arguments[0].match(/^\[(HMR|WDS)\]/))) {
+            console_log.apply(global.console,arguments)
+          }
+        }
+        // Credits to: https://github.com/webpack/webpack-dev-server/issues/109#issuecomment-143189783
+      })(window)
+    }
+  }
 }
 
 module.exports.isFunction = isFunction;
@@ -240,3 +285,4 @@ module.exports.getComponentByPathname = getComponentByPathname;
 module.exports.getComponentFromRoutes = getComponentFromRoutes;
 module.exports.isBrowser = isBrowser;
 module.exports.syncRouter = syncRouter;
+module.exports.removeInitialState = removeInitialState;
