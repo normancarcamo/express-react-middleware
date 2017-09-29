@@ -1,6 +1,6 @@
 {
   "name": "express-react-middleware",
-  "version": "1.1.12",
+  "version": "1.1.13",
   "description": "Render react components from the server as views",
   "main": "index.js",
   "license": "MIT",
