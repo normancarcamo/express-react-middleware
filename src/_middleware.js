@@ -173,6 +173,8 @@ module.exports = (options) => {
             state: $('#__initial_state__').html(),
             mount: $(`#${id}`).html()
           },
+          routes: routes ? options.routes.collection : null,
+          route: routes ? getComponentByPathname(options.routes.collection, _url) : null
         };
       }
 
