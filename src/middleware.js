@@ -42,8 +42,8 @@ module.exports = function (options) {
             }
           }
 
-          _url = _url ? _url : originalUrl ? req.originalUrl : req.url;
-          var results = getComponentFromRoutes(options.routes.collection, _url, props, extract);
+          var results = getComponentFromRoutes(options.routes.collection, url ? url : originalUrl ? req.originalUrl : req.url, props, extract);
+
           results.reactRouter = true;
 
           return { component: results.Component, props: results };
@@ -77,9 +77,9 @@ module.exports = function (options) {
         }
       }
 
-      function prepareContent(url, component, props, template, id) {
+      function prepareContent(_url, component, props, template, id) {
         // -------------------------------------------------------- Content:
-        var content = renderComponent(url, component, props);
+        var content = renderComponent(_url, component, props);
         var $ = require('cheerio').load(template);
         $('title').text(props.props.title);
         $('head').append('<script id="__initial_state__">window.__INITIAL_STATE__ = ' + avoidXSS(props) + ';</script>');
@@ -126,8 +126,7 @@ module.exports = function (options) {
         // ---------------------------------------------------------- Content:
 
 
-        _url = _url ? _url : originalUrl ? req.originalUrl : req.url;
-        var results = prepareContent(_url, component, props, templateHTML, mountId);
+        var results = prepareContent(url ? url : originalUrl ? req.originalUrl : req.url, component, props, templateHTML, mountId);
 
         // ---------------------------------------------------------- Return:
         return prepareResults(results, arguments[arguments.length - 1]);
@@ -146,7 +145,6 @@ module.exports = function (options) {
 
     var routes = false;
     var extract = false;
-    var _url = url || null;
 
     // Check if routes option is valid:
     if ('routes' in options) {

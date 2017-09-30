@@ -24,7 +24,6 @@ module.exports = (options) => {
     let { templateHTML, mountId, componentsPath, originalUrl, url } = options;
     let routes = false;
     let extract = false;
-    let _url = url || null;
 
     // Check if routes option is valid:
     if (('routes' in options)) {
@@ -112,8 +111,13 @@ module.exports = (options) => {
             }
           }
 
-          _url = _url ? _url : originalUrl ? req.originalUrl : req.url;
-          let results = getComponentFromRoutes(options.routes.collection, _url, props, extract);
+          let results = getComponentFromRoutes(
+            options.routes.collection,
+            url ? url : originalUrl ? req.originalUrl : req.url,
+            props,
+            extract
+          );
+
           results.reactRouter = true;
 
           return { component: results.Component, props: results };
@@ -147,9 +151,9 @@ module.exports = (options) => {
         }
       }
 
-      function prepareContent(url, component, props, template, id) {
+      function prepareContent(_url, component, props, template, id) {
         // -------------------------------------------------------- Content:
-        let content = renderComponent(url, component, props);
+        let content = renderComponent(_url, component, props);
         let $ = require('cheerio').load(template);
         $('title').text(props.props.title);
         $('head').append(`<script id="__initial_state__">window.__INITIAL_STATE__ = ${avoidXSS(props)};</script>`);
@@ -192,8 +196,13 @@ module.exports = (options) => {
         let { component, props } = prepareComponent(...arguments);
 
         // ---------------------------------------------------------- Content:
-        _url = _url ? _url : originalUrl ? req.originalUrl : req.url;
-        let results = prepareContent(_url, component, props, templateHTML, mountId);
+        let results = prepareContent(
+          url ? url : originalUrl ? req.originalUrl : req.url,
+          component,
+          props,
+          templateHTML,
+          mountId
+        );
 
         // ---------------------------------------------------------- Return:
         return prepareResults(results, arguments[arguments.length-1]);
