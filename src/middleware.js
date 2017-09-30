@@ -42,7 +42,8 @@ module.exports = function (options) {
             }
           }
 
-          var results = getComponentFromRoutes(options.routes.collection, req.url, props, extract);
+          _url = _url ? _url : originalUrl ? req.originalUrl : req.url;
+          var results = getComponentFromRoutes(options.routes.collection, _url, props, extract);
           results.reactRouter = true;
 
           return { component: results.Component, props: results };
@@ -123,7 +124,8 @@ module.exports = function (options) {
         // ---------------------------------------------------------- Content:
 
 
-        var results = prepareContent(req.url, component, props, templateHTML, mountId);
+        _url = _url ? _url : originalUrl ? req.originalUrl : req.url;
+        var results = prepareContent(_url, component, props, templateHTML, mountId);
 
         // ---------------------------------------------------------- Return:
         return prepareResults(results, arguments[arguments.length - 1]);
@@ -137,11 +139,14 @@ module.exports = function (options) {
     var templateHTML = options.templateHTML,
         mountId = options.mountId,
         componentsPath = options.componentsPath,
-        routes = false,
-        extract = false;
+        originalUrl = options.originalUrl,
+        url = options.url;
+
+    var routes = false;
+    var extract = false;
+    var _url = url || null;
 
     // Check if routes option is valid:
-
     if ('routes' in options) {
       if (!isObject(options.routes)) {
         throw '"routes" property must be an object.';

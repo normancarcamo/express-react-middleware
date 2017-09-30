@@ -21,7 +21,10 @@ module.exports = (options) => {
   if (isObject(options)) {
 
     // Get variables from options (if they were passed...)
-    let { templateHTML, mountId, componentsPath } = options, routes = false, extract = false;
+    let { templateHTML, mountId, componentsPath, originalUrl, url } = options;
+    let routes = false;
+    let extract = false;
+    let _url = url || null;
 
     // Check if routes option is valid:
     if (('routes' in options)) {
@@ -109,7 +112,8 @@ module.exports = (options) => {
             }
           }
 
-          let results = getComponentFromRoutes(options.routes.collection, req.url, props, extract);
+          _url = _url ? _url : originalUrl ? req.originalUrl : req.url;
+          let results = getComponentFromRoutes(options.routes.collection, _url, props, extract);
           results.reactRouter = true;
 
           return { component: results.Component, props: results };
@@ -186,7 +190,8 @@ module.exports = (options) => {
         let { component, props } = prepareComponent(...arguments);
 
         // ---------------------------------------------------------- Content:
-        let results = prepareContent(req.url, component, props, templateHTML, mountId);
+        _url = _url ? _url : originalUrl ? req.originalUrl : req.url;
+        let results = prepareContent(_url, component, props, templateHTML, mountId);
 
         // ---------------------------------------------------------- Return:
         return prepareResults(results, arguments[arguments.length-1]);
