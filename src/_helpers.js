@@ -225,7 +225,8 @@ function syncRouter(arrayRoutes, defaultComponent) {
     props: properties,
     refresh: !('pushState' in window.history),
     render: render,
-    found: !!component
+    found: !!component,
+    managed: router
   };
 
   removeInitialState();
